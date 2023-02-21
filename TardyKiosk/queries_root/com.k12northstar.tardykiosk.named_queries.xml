@@ -195,6 +195,7 @@
       <column column="u_tardies.message">comment</column>
       <column column="students.lastfirst">lastfirst</column>
       <column column="students.student_number">student_number</column>
+      <column column="students.id">studentid</column>
       <column column="students.first_name">first_name</column>
       <column column="students.last_name">last_name</column>
       <column column="teachers.first_name">teacher_first</column>
