@@ -1,0 +1,15 @@
+<permission_mappings>
+  <permission name='/admin/tardy_kiosk/home.html'>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.current_section</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.override_section</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.meeting_exists</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.history</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.tardy_count</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.attendance_codes</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.attendance_categories</implies>
+   <implies allow="post">/ws/schema/query/com.k12northstar.tardykiosk.periods</implies>
+   <implies allow="post">/ws/schema/table/u_tardies</implies>
+   <implies allow="post">/ws/schema/table/u_tardies_settings</implies>
+   <implies allow="get">/ws/schema/table/u_tardies_settings</implies>
+  </permission>
+</permission_mappings>

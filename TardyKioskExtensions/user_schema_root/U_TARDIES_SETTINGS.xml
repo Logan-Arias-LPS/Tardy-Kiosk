@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<psExtension xmlns="http://www.powerschool.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.powerschool.com psextension.xsd">
+  <extensionname>U_TARDIES</extensionname>
+    <extendedTable coreTable="Schools" dbTableName="U_TARDIES_SETTINGS" comment="">
+      <field name="tardy_code" type="string" length="16"/>
+      <field name="late_tardy_code" type="string" length="16" />
+  		<field name="tardy_minutes" type="integer" />
+      <field name="late_tardy_minutes" type="integer" />
+      <field name="tardy_category" type="string" length="32" />
+      <field name="default_comment" type="string" length="255" />
+      <field name="total_tardies_by" type="integer"/>
+      <field name="footer" type="string" length="64" />
+      <field name="header" type="string" length="64" />
+      <field name="print_tardy_slip" type="integer" />
+      <field name="existing_attendance_warning" type="boolean"/>
+      <field name="id_type" type="string" length="64" />
+      <field name="disable_comment" type="boolean"/>
+      <field name="period_override" type="integer" />
+      <field name="slip_disable_comment" type="boolean" />
+    </extendedTable>
+</psExtension>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<psExtension xmlns="http://www.powerschool.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.powerschool.com psextension.xsd">
+    <extensionname>U_TARDIES</extensionname>
+    <extendedTable coreTable="Students" dbTableName="U_TARDIES" childName="U_TARDIES" comment="">
+  		<field name="cc_id" type="integer" />
+      <field name="school_id" type="integer" />
+      <field name="term_id" type="integer" />
+  		<field name="message" type="string" length="512" />
+      <field name="att_code_id" type="integer" />
+      <field name="student_id" type="integer" />
+      <field name="period_id" type="integer" />
+      <field name="date_entered" type="long" />
+      <field name="class_tardy_count" type="integer" />
+      <field name="total_tardy_count" type="integer" />
+    </extendedTable>
+</psExtension>

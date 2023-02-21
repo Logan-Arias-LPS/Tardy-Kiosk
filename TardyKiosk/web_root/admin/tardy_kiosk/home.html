@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tardy Kiosk</title>
+  <!-- required scripts -->
+  ~[wc:commonscripts]
+  <!-- Required style sheets: screen.css, and print.css -->
+  <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+  <link href="/images/css/print.css" rel="stylesheet" media="print">
+  <link href="tardy_kiosk.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  ~[wc:admin_header_css]
+<a href="/admin/home.html" target="_top">Start Page</a> &gt; Tardy Kiosk
+  <!-- start of main menu and content -->
+  ~[wc:admin_navigation_css]
+  <!-- Start of Page -->
+  <h1>Tardy Kiosk</h1>
+  <!-- start of content area -->
+
+  <div id="tardyModule" class="tabs">
+    <ul>
+      <li><a id="kiosk_main" href="#tardyMain">Tardy Entry</a></li>
+      <li><a id="kiosk_history_tab" href="#tardyHistory">Kiosk History</a></li>
+      <li><a href="#tardySettings">Setup</a></li>
+    </ul>
+    <div id="tardyMain">
+      <div class="box-round" data-ng-controller="tardyController as vm" data-ng-cloak id="tardyControllerID" ng-init="vm.school_number='~(curschoolid)'">
+        <table>
+          <tr>
+            <th colspan="2">Mark Student Tardy</th>
+          </tr>
+          <tr>
+            <td style="width: 1px;">
+              <label>Student ID:</label>
+              <input id="student_lookup" ng-model="vm.student_lookup" ng-keypress="($event.charCode==13)?vm.tardy():return" type="text" autofocus/>
+            </td>
+            <td>
+              <label>Comment:</label>
+              <textarea ng-disabled="vm.settings.disable_comment" ng-model="vm.comment"/></textarea>
+            </td>
+          </tr>
+        </table>
+        <div class="button-row">
+          <button ng-disabled="valid_input(vm.student_lookup)" ng-click="vm.tardy()">Submit Tardy</button>
+        </div>
+      </div>
+    </div>
+    <div id="tardyHistory">
+      <div class="box-round" data-ng-controller="tardyHistoryController as vm" data-ng-cloak id="tardyHistoryControllerID"  ng-init="vm.init('~(curschoolid)');">
+        <table>
+          <tr>
+            <th colspan="2">Filter Options</th>
+          </tr>
+          <tr>
+            <td style="width: 1px;">
+              <label>Student #:</label>
+              <input ng-model="vm.tardyHistory.searchParameters.student_number" type="text"/>
+            </td>
+          </tr>
+        </table>
+        <div class="button-row">
+          <button ng-click="vm.apply()">Apply</button>
+        </div>
+
+        <div id="tardyHistoryGrid" data-pss-grid-widget data-data="vm.tardyHistory.pageOfResults" data-pagination-controls="vm.tardyHistory.pgController" data-filter-constraint="no-filters">
+          <table class="grid">
+            <thead>
+              <tr>
+                <th></th>
+                <th data-pss-sort-fields="u_tardies.dateentered|date">Date</th>
+                <th data-pss-sort-fields="u_tardies.student_number|number">Student #</th>
+                <th data-pss-sort-fields="u_tardies.lastfirst">Last, First</th>
+                <th data-pss-sort-fields="u_tardies.term">Term</th>
+                <th data-pss-sort-fields="u_tardies.school_name">School</th>
+                <th data-pss-sort-fields="u_tardies.course_number">Course #</th>
+                <th data-pss-sort-fields="u_tardies.course_name">Course Name</th>
+                <th data-pss-sort-fields="u_tardies.att_code">Att. Code</th>
+                <th data-pss-sort-fields="u_tardies.comment">Comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-ng-repeat="item in vm.tardyHistory.pageOfResults" >
+                <td><button ng-click="vm.printHistory(item)">Slip</button></td>
+                <td>{{ item.dateentered }}</td>
+                <td>{{ item.student_number }}</td>
+                <td><a href="/admin/students/home.html?frn=001{{ item.studentsdcid }}&lsp=/admin/attendance/view/meeting.html" target="_blank">{{ item.lastfirst }}</a></td>
+                <td>{{ item.term }}</td>
+                <td>{{ item.school_name }}</td>
+                <td>{{ item.course_number }}</td>
+                <td>{{ item.course_name }}</td>
+                <td>{{ item.att_code }}</td>
+                <td>{{ item.comment }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tardySettings">
+      <div class="box-round" data-ng-controller="tardySettingsController as vm" data-ng-cloak id="tardySettingsControllerID" ng-init="vm.settings.school_number='~(curschoolid)'; vm.settings.schoolsdcid='~[tlist_sql;SELECT dcid FROM schools WHERE school_number = ~(curschoolid)]~(dcid)[/tlist_sql]'; vm.init();" >
+        <table>
+          <tr>
+            <th colspan="4">Tardy Kiosk Settings for ~[tlist_sql;SELECT name FROM SCHOOLS WHERE school_number=~(curschoolid)]~(name)[/tlist_sql]</th>
+          </tr>
+          <tr>
+            <td style="width: 1px;">
+              <label>ID Type:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.id_type" required>
+                <option value=""></option>
+                <option value="Student_Number">Student_Number</option>
+                <option value="Lunch_ID">Lunch_ID</option>
+                <option value="State_StudentNumber">State_StudentNumber</option>
+              </select>
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="width: 1px;">
+              <label>Tardy Code:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.tardy_code">
+                <option value=""></option>
+                <option ng-repeat="option in vm.settings.attendanceCodes track by $index" value="{{option.code}}">{{option.code}} - {{option.description}}</option>
+              </select>
+            </td>
+            <td style="width: 1px;">
+              <label>Minutes Until Considered Tardy:</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.tardy_minutes" type="text" required/></td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Late Tardy Code:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.late_tardy_code">
+                <option value=""></option>
+                <option ng-repeat="option in vm.settings.attendanceCodes track by $index" value="{{option.code}}">{{option.code}} - {{option.description}}</option>
+              </select>
+            </td>
+            <td>
+              <label>Minutes Until Considered Late Tardy:</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.late_tardy_minutes" type="text"/>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Existing Attendance Warning:</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.existing_attendance_warning" type="checkbox"/>
+            </td>
+            <td>
+              <label>Print Tardy Slip:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.print_tardy_slip" required>
+                <option value=""></option>
+                <option value="0">No</option>
+                <option value="1">Prompt</option>
+                <option value="2">Always</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Tardy Count Category:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.tardy_category">
+                <option value=""></option>
+                <option ng-repeat="option in vm.settings.attendanceCategories track by $index" value="{{option.code}}">{{option.name}}</option>
+              </select>
+            </td>
+            <td>
+              <label>Tardy Slip Total Tardies by:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.total_tardies_by" required>
+                <option value=""></option>
+                <option value="4">Quarter</option>
+                <option value="3">Trimester</option>
+                <option value="2">Semester</option>
+                <option value="1">Year</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Daily Attendance Period Override</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.period_override">
+                <option value="">Default</option>
+                <option ng-repeat="option in vm.settings.periods track by $index" value="{{option.id}}">{{option.period_number}}</option>
+              </select>
+            </td>
+            <td colspan="2">
+              &nbsp;
+            </td>
+          </tr>
+          <tr>
+          <tr>
+            <td>
+              <label>Tardy Slip Header</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.header" class="long" type="text"/>
+            </td>
+            <td>
+              <label>Tardy Slip Footer</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.footer" class="long" type="text"/>
+            </td>
+          </tr>
+          <tr>
+            <td rowspan="2">
+              <label>Default Comment</label>
+            </td>
+            <td rowspan="2">
+              <textarea ng-model="vm.settings.default_comment"/></textarea>
+            </td>
+            <td>
+              <label>Disable Comment on Entry Screen</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.disable_comment" type="checkbox"/>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Disable Comment on Tardy Slip</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.slip_disable_comment" type="checkbox"/>
+            </td>
+          </tr>
+        </table>
+          <div class="button-row">
+            <div data-ng-if="vm.loading" class="right progress small" data-pss-wait-spinner="small"></div>
+            <button ng-click="vm.testPrint()">Test Print</button>
+            <button ng-click="vm.save()">Save Settings</button>
+          </div>
+          <table>
+          <tr>
+            <th colspan="4">Temp User Override Settings for ~[tlist_sql;SELECT lastfirst FROM USERS WHERE dcid=~[x:users_dcid]]~(name)[/tlist_sql]</th>
+          </tr>
+          <tr>
+            <td style="width: 1px;">
+              <label>Tardy Code:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.user.tardy_code">
+                <option value=""></option>
+                <option ng-repeat="option in vm.settings.attendanceCodes track by $index" value="{{option.code}}">{{option.code}} - {{option.description}}</option>
+              </select>
+            </td>
+            <td style="width: 1px;">
+              <label>Minutes Until Considered Tardy:</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.user.tardy_minutes" type="text" required/></td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Late Tardy Code:</label>
+            </td>
+            <td>
+              <select ng-model="vm.settings.user.late_tardy_code">
+                <option value=""></option>
+                <option ng-repeat="option in vm.settings.attendanceCodes track by $index" value="{{option.code}}">{{option.code}} - {{option.description}}</option>
+              </select>
+            </td>
+            <td>
+              <label>Minutes Until Considered Late Tardy:</label>
+            </td>
+            <td>
+              <input ng-model="vm.settings.user.late_tardy_minutes" type="text"/>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: red;" colspan="4">
+              User Settings are per computer/per session. Reloading the page will clear temp user settings.
+            </td>
+          </tr>
+        </table>
+        <div class="button-row">
+          <button ng-click="vm.clearTempSettings()">Clear Temp User Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <iframe style="display: none;" name="tardySlipFrame"></iframe>
+  <!-- end of content area -->
+  ~[wc:admin_footer_css]
+  <script>
+    require([
+    'angular',
+    'tardyKiosk/tardyModule',
+    'tardyKiosk/tardyHistoryController',
+    'tardyKiosk/tardyHistoryService',
+    'tardyKiosk/tardyController',
+    'tardyKiosk/tardyService',
+    'tardyKiosk/tardySettingsController',
+    'tardyKiosk/tardySettingsService',
+    'components/shared/index'
+    ], function (angular) {
+    angular.bootstrap(document.getElementById('tardyModule'), ['tardyModule']);
+    });
+
+  </script>
+</body>
+</html>

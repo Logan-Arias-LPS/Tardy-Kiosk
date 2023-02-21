@@ -1,0 +1,497 @@
+<queries>
+  <query name="com.k12northstar.tardykiosk.current_section" coreTable="calendar_day" flattened="true">
+    <description>Student Classes by Current Time</description>
+    <args>
+      <arg name="student_lookup" required="true" description="The Student you wish you wish to query on" type="primitive"/>
+      <arg name="school_number" required="true" description="The School Number you wish to query" type="primitive"/>
+      <arg name="clockin" required="true" description="Clockin time, seconds past midnight" type="primitive"/>
+      <arg name="current_date" required="true" description="Current Date (yyyy-mm-dd)" type="primitive"/>
+    </args>
+    <columns>
+      <column column="period.id">periodid</column> <!-- See below -->
+      <column column="section_meeting.sectionid">sectionid</column>
+      <column column="section_meeting.schoolid">schoolid</column>
+      <column column="schools.dcid">schoolsdcid</column>
+      <column column="cc.termid">yearid</column>
+      <column column="cc.termid">termid</column>
+      <column column="cc.id">ccid</column>
+      <column column="Students.dcid">studentsdcid</column>
+      <column column="Students.id">studentid</column>
+      <column column="Students.first_name">first_name</column>
+      <column column="Students.last_name">last_name</column>
+      <column column="Students.student_number">student_number</column>
+      <column column="courses.course_number">course_number</column>
+      <column column="courses.course_name">course_name</column>
+      <column column="cc.expression">expression</column>
+      <column column="teachers.first_name">teachers_first_name</column>
+      <column column="teachers.last_name">teachers_last_name</column>
+      <column column="bell_schedule_items.start_time">minutes_late</column>
+      <column column="bell_schedule_items.minutes_attended">total_minutes</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+          p.id AS periodid,
+          sm.sectionid as sectionid,
+          sm.schoolid as schoolid,
+          schools.dcid as schoolsdcid,
+          substr(cc1.termid,0,2) AS yearid,
+          cc1.termid AS termid,
+          cc1.id as ccid,
+          (SELECT dcid FROM STUDENTS WHERE id=cc1.studentid) as studentsdcid,
+          students.id as studentid,
+          students.first_name as first_name,
+          students.last_name as last_name,
+          students.student_number,
+          courses.course_number,
+          courses.course_name,
+          cc1.expression,
+          teachers.first_name as teachers_first_name,
+          teachers.last_name as teachers_last_name,
+          round((TO_NUMBER(:clockin) - bsi.start_time)/60,2) as minutes_late,
+          bsi.minutes_attended as total_minutes
+      FROM
+          calendar_day cd
+          JOIN cycle_day cyd ON (cd.cycle_day_id=cyd.id)
+          JOIN bell_schedule_items bsi ON ( cd.bell_schedule_id = bsi.bell_schedule_id )
+          JOIN period p ON ( bsi.period_id = p.id )
+          JOIN section_meeting sm ON ( p.year_id = sm.year_id
+                                       AND p.schoolid = sm.schoolid
+                                       AND p.period_number = sm.period_number
+                                       AND cyd.letter=sm.cycle_day_letter)
+          JOIN cc cc1 ON ( sm.sectionid = cc1.sectionid )
+          JOIN students ON (cc1.studentid=students.id)
+          JOIN courses ON (cc1.course_number=courses.course_number)
+          JOIN schools ON (sm.schoolid=schools.school_number)
+          JOIN teachers ON (cc1.teacherid=teachers.id)
+          JOIN U_Tardies_Settings ON (schools.dcid=U_Tardies_Settings.schoolsdcid)
+      WHERE
+          cd.date_value = to_date(:current_date, 'yyyy-mm-dd')
+          AND (TO_NUMBER(:clockin)) BETWEEN bsi.start_time AND bsi.end_time
+          AND
+           (
+                students.student_number = CASE U_Tardies_Settings.id_type WHEN 'Student_Number' THEN :student_lookup ELSE NULL END
+            OR  students.lunch_ID = CASE U_Tardies_Settings.id_type WHEN 'Lunch_ID' THEN :student_lookup ELSE NULL END
+            OR  students.state_studentnumber = CASE U_Tardies_Settings.id_type WHEN 'State_StudentNumber' THEN :student_lookup ELSE NULL END
+           )
+          AND sm.schoolid = :school_number
+          AND cc1.dateenrolled <= to_date(:current_date, 'yyyy-mm-dd')
+          AND cc1.dateleft > to_date(:current_date, 'yyyy-mm-dd')
+      ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.override_section" coreTable="calendar_day" flattened="true">
+    <description>Student Classes by Period Override</description>
+    <args>
+      <arg name="studentsdcid" required="true" description="The Student's dcid'" type="primitive"/>
+      <arg name="school_number" required="true" description="The School Number you wish to query" type="primitive"/>
+      <arg name="periodid" required="true" description="Internal Period Id" type="primitive"/>
+      <arg name="current_date" required="true" description="Current Date (yyyy-mm-dd)" type="primitive"/>
+    </args>
+    <columns>
+      <column column="period.id">periodid</column> <!-- See below -->
+      <column column="section_meeting.sectionid">sectionid</column>
+      <column column="section_meeting.schoolid">schoolid</column>
+      <column column="schools.dcid">schoolsdcid</column>
+      <column column="cc.termid">yearid</column>
+      <column column="cc.termid">termid</column>
+      <column column="cc.id">ccid</column>
+      <column column="Students.dcid">studentsdcid</column>
+      <column column="Students.id">studentid</column>
+      <column column="Students.first_name">first_name</column>
+      <column column="Students.last_name">last_name</column>
+      <column column="Students.student_number">student_number</column>
+      <column column="courses.course_number">course_number</column>
+      <column column="courses.course_name">course_name</column>
+      <column column="cc.expression">expression</column>
+      <column column="teachers.first_name">teachers_first_name</column>
+      <column column="teachers.last_name">teachers_last_name</column>
+      <column column="bell_schedule_items.minutes_attended">total_minutes</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+          p.id AS periodid,
+          sm.sectionid as sectionid,
+          sm.schoolid as schoolid,
+          schools.dcid as schoolsdcid,
+          substr(cc1.termid,0,2) AS yearid,
+          cc1.termid AS termid,
+          cc1.id as ccid,
+          (SELECT dcid FROM STUDENTS WHERE id=cc1.studentid) as studentsdcid,
+          students.id as studentid,
+          students.first_name as first_name,
+          students.last_name as last_name,
+          students.student_number,
+          courses.course_number,
+          courses.course_name,
+          cc1.expression,
+          teachers.first_name as teachers_first_name,
+          teachers.last_name as teachers_last_name,
+          bsi.minutes_attended as total_minutes
+      FROM
+          calendar_day cd
+          JOIN cycle_day cyd ON (cd.cycle_day_id=cyd.id)
+          JOIN bell_schedule_items bsi ON ( cd.bell_schedule_id = bsi.bell_schedule_id )
+          JOIN period p ON ( bsi.period_id = p.id )
+          JOIN section_meeting sm ON ( p.year_id = sm.year_id
+                                       AND p.schoolid = sm.schoolid
+                                       AND p.period_number = sm.period_number
+                                       AND cyd.letter=sm.cycle_day_letter)
+          JOIN cc cc1 ON ( sm.sectionid = cc1.sectionid )
+          JOIN students ON (cc1.studentid=students.id)
+          JOIN courses ON (cc1.course_number=courses.course_number)
+          JOIN schools ON (sm.schoolid=schools.school_number)
+          JOIN teachers ON (cc1.teacherid=teachers.id)
+      WHERE
+          cd.date_value = to_date(:current_date, 'yyyy-mm-dd')
+          AND p.id = :periodid
+          AND students.dcid = :studentsdcid
+          AND sm.schoolid = :school_number
+          AND cc1.dateenrolled <= to_date(:current_date, 'yyyy-mm-dd')
+          AND cc1.dateleft > to_date(:current_date, 'yyyy-mm-dd')
+      ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.meeting_exists" coreTable="attendance" flattened="true">
+    <description>Attendance Record Exists</description>
+    <args>
+      <arg name="att_date" required="true" description="Attendance Date" type="primitive"/>
+      <arg name="periodid" required="true" description="Period ID" type="primitive"/>
+      <arg name="ccid" required="true" description="CC ID" type="primitive"/>
+      <arg name="studentid" required="true" description="Student ID" type="primitive"/>
+    </args>
+    <columns>
+      <column column="attendance.dcid">dcid</column>
+      <column column="attendance_code.att_code">att_code</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+          attendance.dcid,
+          ac.att_code
+      FROM
+          attendance
+          JOIN attendance_code ac ON (attendance.attendance_codeid=ac.id)
+      WHERE
+          attendance.att_date = to_date(:att_date, 'yyyy-mm-dd')
+          AND attendance.periodid = :periodid
+          AND attendance.ccid = :ccid
+          AND attendance.studentid = :studentid
+          AND attendance.att_mode_code = 'ATT_ModeMeeting'
+    ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.history" coreTable="u_tardies" flattened="true">
+    <description>Tardy History Records</description>
+    <args>
+      <arg name="schoolid" required="true" description="School ID" type="primitive"/>
+      <arg name="snumber" required="false" description="Student Number" type="primitive" default="-1"/>
+    </args>
+    <columns>
+      <column column="u_tardies.studentsdcid">studentsdcid</column>
+      <column column="attendance_code.att_code">att_code</column>
+      <column column="attendance_code.description">att_description</column>
+      <column column="u_tardies.message">comment</column>
+      <column column="students.lastfirst">lastfirst</column>
+      <column column="students.student_number">student_number</column>
+      <column column="students.first_name">first_name</column>
+      <column column="students.last_name">last_name</column>
+      <column column="teachers.first_name">teacher_first</column>
+      <column column="teachers.last_name">teacher_last</column>
+      <column column="sections.expression">expression</column>
+      <column column="schools.name">school_name</column>
+      <column column="courses.course_number">course_number</column>
+      <column column="courses.course_name">course_name</column>
+      <column column="terms.abbreviation">term</column>
+      <column column="u_tardies.date_entered">dateentered</column>
+      <column column="u_tardies.class_tardy_count">class_tardy_count</column>
+      <column column="u_tardies.total_tardy_count">total_tardy_count</column>
+
+
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT u.studentsdcid, attendance_code.att_code, attendance_code.description as att_description, u.message, s.lastfirst, s.student_number, s.first_name, s.last_name, teachers.first_name AS teacher_first, teachers.last_name as teacher_last, sections.expression,
+       schools.name as school_name,
+         courses.course_number, courses.course_name, terms.abbreviation,
+         TO_CHAR(
+            FROM_TZ( CAST( (TO_DATE('1970-01-01','YYYY-MM-DD') + ((u.date_entered/1000) / 86400)) AS TIMESTAMP ), 'UTC' ) AT LOCAL,
+            'MM/DD/YYYY HH: MI PM'
+          ) AS date_entered,
+         u.class_tardy_count as class_tardy_count,
+         u.total_tardy_count as total_tardy_count
+         FROM U_TARDIES u
+         INNER JOIN Students s ON (u.studentsdcid=s.dcid)
+         INNER JOIN Schools ON (u.school_id=Schools.school_number)
+         INNER JOIN CC ON (u.cc_id=cc.id)
+         INNER JOIN Courses ON (CC.course_number=courses.course_number)
+         INNER JOIN Sections ON (cc.sectionid=sections.id)
+         INNER JOIN TERMS ON (terms.schoolid=:schoolid AND u.term_id=terms.id)
+         INNER JOIN Teachers ON (sections.teacher=teachers.id)
+         INNER JOIN Attendance_Code ON (u.att_code_id=Attendance_Code.id)
+         WHERE
+           u.school_id = :schoolid
+         AND
+         s.student_number =
+           CASE to_number(:snumber)
+             WHEN -1 THEN s.student_number
+             ELSE to_number(:snumber)
+           END
+         AND u.whencreated >= add_months(sysdate, -12)
+         ORDER BY u.WHENCREATED DESC
+    ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.tardy_count" coreTable="attendance" flattened="true">
+    <description>Tardy Count</description>
+    <args>
+      <arg name="student_number" required="true" description="Student Number" type="primitive"/>
+      <arg name="schoolsdcid" required="true" description="School DCID" type="primitive"/>
+      <arg name="modecode" required="true" description="Mode Code" type="primitive"/>
+      <arg name="tardy_category" required="true" description="Tardy Category" type="primitive"/>
+      <arg name="ccid" required="false" description="CC ID" type="primitive" default="-1"/>
+      <arg name="term_portion" required="true" description="Term to use" type="primitive"/>
+
+    </args>
+    <columns>
+      <column column="attendance.id">tardycount</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+        COUNT(att.id) AS tardycount
+    FROM
+        attendance att
+        INNER JOIN students s ON ( att.studentid = s.id )
+    WHERE
+        s.student_number =:student_number
+        AND att.att_mode_code =:modecode
+        AND
+        att.ccid =
+          CASE to_number(:ccid)
+            WHEN -1 THEN att.ccid
+            ELSE to_number(:ccid)
+          END
+        AND att.att_date BETWEEN (
+            SELECT
+                t1.firstday
+            FROM
+                terms t1
+            WHERE
+                t1.schoolid = (
+                    SELECT
+                        s1.school_number
+                    FROM
+                        schools s1
+                    WHERE
+                        s1.dcid =:schoolsdcid
+                )
+                AND SYSDATE BETWEEN t1.firstday AND t1.lastday
+                AND t1.portion = :term_portion
+        ) AND (
+            SELECT
+                t.lastday
+            FROM
+                terms t
+            WHERE
+                t.schoolid = (
+                    SELECT
+                        s.school_number
+                    FROM
+                        schools s
+                    WHERE
+                        s.dcid =:schoolsdcid
+                )
+                AND SYSDATE BETWEEN t.firstday AND t.lastday
+                AND t.portion = :term_portion
+        )
+        AND att.attendance_codeid IN (
+            SELECT DISTINCT
+                attce.attendance_codeid
+            FROM
+                code_entity ce
+                INNER JOIN att_code_code_entity attce ON ( ce.id = attce.code_entityid )
+            WHERE
+                LOWER(ce.ce_code) = LOWER(:tardy_category)
+        )
+    ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.attendance_codes" coreTable="attendance_code" flattened="true">
+    <description>Attendance Codes</description>
+    <args>
+      <arg name="schoolsdcid" required="true" description="School DCID" type="primitive"/>
+    </args>
+    <columns>
+      <column column="attendance_code.id">id</column>
+      <column column="attendance_code.att_code">code</column>
+      <column column="attendance_code.description">description</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+          id,
+          att_code,
+          description
+      FROM
+          attendance_code
+      WHERE
+              attendance_code.schoolid = (
+                  SELECT
+                      school_number
+                  FROM
+                      schools
+                  WHERE
+                      dcid = :schoolsdcid
+              )
+          AND attendance_code.yearid = ( coalesce((
+              SELECT
+                  yearid
+              FROM
+                  terms
+              WHERE
+                  sysdate BETWEEN firstday AND lastday
+                  AND schoolid =(
+                      SELECT
+                          school_number
+                      FROM
+                          schools
+                      WHERE
+                          dcid = :schoolsdcid
+                  )
+                  AND isyearrec = 1
+          ),(
+              SELECT
+                  *
+              FROM
+                  (
+                      SELECT
+                          yearid
+                      FROM
+                          terms
+                      WHERE
+                              firstday > sysdate
+                          AND schoolid =(
+                              SELECT
+                                  school_number
+                              FROM
+                                  schools
+                              WHERE
+                                  dcid = :schoolsdcid
+                          )
+                          AND isyearrec = 1
+                      ORDER BY
+                          yearid ASC
+                  )
+              WHERE
+                  ROWNUM <= 1
+          )) )
+      ORDER BY
+          att_code ASC
+    ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.attendance_categories" coreTable="code_entity" flattened="true">
+    <description>Attendance Categories</description>
+    <args>
+      <arg name="schoolsdcid" required="true" description="School DCID" type="primitive"/>
+    </args>
+    <columns>
+      <column column="code_entity.external_name">name</column>
+      <column column="code_entity.ce_code">code</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+        external_name,
+        ce_code
+    FROM
+        code_entity
+    WHERE
+        schoolid = (
+            SELECT
+                school_number
+            FROM
+                schools
+            WHERE
+                dcid =:schoolsdcid
+        )
+        AND ce_entity = 'att_attcodeentity'
+        ORDER BY External_name
+    ]]>
+    </sql>
+  </query>
+  <query name="com.k12northstar.tardykiosk.periods" coreTable="Period" flattened="true">
+    <description>Periods</description>
+    <args>
+      <arg name="schoolsdcid" required="true" description="School DCID" type="primitive"/>
+    </args>
+    <columns>
+      <column column="period.id">id</column>
+      <column column="period.period_number">period_number</column>
+    </columns>
+    <sql>
+      <![CDATA[
+      SELECT
+        id,
+        period_number
+      FROM
+        period
+      WHERE
+        schoolid = (
+            SELECT
+                school_number
+            FROM
+                schools
+            WHERE
+                dcid = :schoolsdcid
+        )
+        AND year_id = ( coalesce((
+          SELECT
+            yearid
+          FROM
+            terms
+          WHERE
+            sysdate BETWEEN firstday AND lastday
+            AND schoolid = (
+                SELECT
+                    school_number
+                FROM
+                    schools
+                WHERE
+                    dcid = :schoolsdcid
+            )
+            AND isyearrec = 1
+          ),(
+          SELECT
+            *
+          FROM
+            (
+              SELECT
+                yearid
+              FROM
+                terms
+              WHERE
+                firstday > sysdate
+                AND schoolid = (
+                    SELECT
+                        school_number
+                    FROM
+                        schools
+                    WHERE
+                        dcid = :schoolsdcid
+                )
+                AND isyearrec = 1
+                ORDER BY yearid ASC
+            )
+          WHERE
+            ROWNUM <= 1
+          )
+        )
+     )
+    ORDER BY period_number ASC
+    ]]>
+    </sql>
+  </query>
+</queries>

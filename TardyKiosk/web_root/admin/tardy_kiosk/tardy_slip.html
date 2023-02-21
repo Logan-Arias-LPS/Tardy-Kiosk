@@ -1,0 +1,41 @@
+<html>
+<head>
+  <style>
+    #header {
+      text-align: center;
+    }
+    #footer {
+      margin-top: 20px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    div {
+      padding-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="header"style="text-align: center">~(gpv.header)</div>
+  <br />
+  <div><label>Student #:</label> ~(gpv.student_number)</div>
+  <div><label>Name:</label> ~(gpv.name)</div>
+  <div><label>Date:</label>~(gpv.date)</div>
+  <div><label>Type:</label> ~(gpv.code)</div>
+  <div><label>Class:</label> ~(gpv.class)</div>
+  <div><label>Teacher:</label> ~(gpv.teacher)</div>
+  <div><label>Class Tardies:</label> ~(gpv.class_tardy_count)</div>
+  <div><label>Total Tardies:</label> ~(gpv.total_tardy_count)</div>
+  ~[if.gpv.slip_disable_comment=0]
+    <div><label>Comment:</label> ~(gpv.comment)</div>
+  [/if]
+  <div id="footer">~(gpv.footer)</div>
+</body>
+</html>
+<script>
+  window.print();
+  window.onafterprint = function(event) { window.close(); };
+</script>

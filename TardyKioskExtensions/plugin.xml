@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation='http://plugin.powerschool.pearson.com plugin.xsd'
+        name="TardyKiosk Extensions"
+        version="1.1.5"
+        description="DB Extension for TardyKiosk.">
+
+  <publisher name="Alex Wolfe">
+    <contact email="alex.wolfe@k12northstar.org" />
+  </publisher>
+
+</plugin>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation='http://plugin.powerschool.pearson.com plugin.xsd'
+        name="Tardy Kiosk"
+        version="1.1.17"
+        description="A simple check-in kiosk for late students that will automatically mark a student tardy for the appropriate class.">
+
+  <publisher name="Alex Wolfe">
+    <contact email="alex.wolfe@k12northstar.org" />
+  </publisher>
+  <links>
+      <link
+              title="Tardy Kiosk"
+              display-text="Tardy Kiosk"
+              path="/admin/tardy_kiosk/home.html">
+          <ui_contexts>
+              <ui_context id="admin.left_nav"/>
+              <ui_context id="admin.header"/>
+          </ui_contexts>
+      </link>
+  </links>
+
+	<oauth></oauth>
+
+  <access_request>
+    <field table="ATTENDANCE" field="STUDENTID" access="FullAccess" />
+    <field table="ATTENDANCE" field="PERIODID" access="FullAccess" />
+    <field table="ATTENDANCE" field="ATT_MODE_CODE" access="FullAccess" />
+    <field table="ATTENDANCE" field="CCID" access="FullAccess" />
+    <field table="ATTENDANCE" field="ATT_COMMENT" access="FullAccess" />
+    <field table="ATTENDANCE" field="ATTENDANCE_CODEID" access="FullAccess" />
+    <field table="ATTENDANCE" field="ATT_DATE" access="FullAccess" />
+    <field table="ATTENDANCE" field="CCID" access="FullAccess" />
+
+    <field table="ATTENDANCE_CODE" field="ID" access="FullAccess" />
+    <field table="ATTENDANCE_CODE" field="ATT_CODE" access="FullAccess" />
+
+    <field table="calendar_day" field="bell_schedule_id" access="ViewOnly" />
+    <field table="calendar_day" field="date_value" access="ViewOnly" />
+
+    <field table="courses" field="course_number" access="ViewOnly" />
+    <field table="courses" field="course_name" access="ViewOnly" />
+
+    <field table="bell_schedule_items" field="bell_schedule_id" access="ViewOnly" />
+    <field table="bell_schedule_items" field="period_id" access="ViewOnly" />
+    <field table="bell_schedule_items" field="start_time" access="ViewOnly" />
+    <field table="bell_schedule_items" field="end_time" access="ViewOnly" />
+
+    <field table="period" field="year_id" access="ViewOnly" />
+    <field table="period" field="schoolid" access="ViewOnly" />
+    <field table="period" field="period_number" access="ViewOnly" />
+    <field table="period" field="id" access="ViewOnly" />
+
+    <field table="section_meeting" field="year_id" access="ViewOnly" />
+    <field table="section_meeting" field="schoolid" access="ViewOnly" />
+    <field table="section_meeting" field="sectionid" access="ViewOnly" />
+    <field table="section_meeting" field="period_number" access="ViewOnly" />
+
+    <field table="cc" field="sectionid" access="ViewOnly" />
+    <field table="cc" field="dateenrolled" access="ViewOnly" />
+    <field table="cc" field="dateleft" access="ViewOnly" />
+    <field table="cc" field="studentid" access="ViewOnly" />
+    <field table="cc" field="id" access="ViewOnly" />
+    <field table="cc" field="termid" access="ViewOnly" />
+    <field table="cc" field="expression" access="ViewOnly" />
+    <field table="cc" field="teacherid" access="ViewOnly" />
+
+    <field table="students" field="dcid" access="ViewOnly" />
+    <field table="students" field="id" access="ViewOnly" />
+    <field table="students" field="student_number" access="ViewOnly" />
+    <field table="students" field="state_studentnumber" access="ViewOnly" />
+    <field table="students" field="lunch_ID" access="ViewOnly" />
+    <field table="students" field="last_name" access="ViewOnly" />
+    <field table="students" field="first_name" access="ViewOnly" />
+
+    <field table="schools" field="school_number" access="ViewOnly" />
+    <field table="schools" field="dcid" access="ViewOnly" />
+
+    <field table="teachers" field="id" access="ViewOnly" />
+    <field table="teachers" field="last_name" access="ViewOnly" />
+    <field table="teachers" field="first_name" access="ViewOnly" />
+
+    <field table="attendance_code" field="schoolid" access="ViewOnly" />
+    <field table="attendance_code" field="yearid" access="ViewOnly" />
+    <field table="attendance_code" field="att_code" access="ViewOnly" />
+    <field table="attendance_code" field="id" access="ViewOnly" />
+
+    <field table="U_TARDIES" field="studentsdcid" access="FullAccess" />
+    <field table="U_TARDIES" field="cc_id" access="FullAccess" />
+    <field table="U_TARDIES" field="school_id" access="FullAccess" />
+    <field table="U_TARDIES" field="term_id" access="FullAccess" />
+    <field table="U_TARDIES" field="message" access="FullAccess" />
+    <field table="U_TARDIES" field="att_code_id" access="FullAccess" />
+    <field table="U_TARDIES" field="student_id" access="FullAccess" />
+    <field table="U_TARDIES" field="period_id" access="FullAccess" />
+    <field table="U_TARDIES" field="total_tardy_count" access="FullAccess" />
+    <field table="U_TARDIES" field="class_tardy_count" access="FullAccess" />
+
+    <field table="U_TARDIES_SETTINGS" field="schoolsdcid" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="tardy_code" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="late_tardy_code" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="tardy_minutes" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="late_tardy_minutes" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="default_comment" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="print_tardy_slip" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="existing_attendance_warning" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="footer" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="header" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="total_tardies_by" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="tardy_category" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="id_type" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="disable_comment" access="FullAccess" />
+    <field table="U_TARDIES_SETTINGS" field="slip_disable_comment" access="FullAccess" />
+
+  </access_request>
+
+</plugin>
