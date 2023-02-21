@@ -213,7 +213,7 @@
     </columns>
     <sql>
       <![CDATA[
-      SELECT u.studentsdcid, attendance_code.att_code, attendance_code.description as att_description, u.message, s.lastfirst, s.student_number, s.first_name, s.last_name, teachers.first_name AS teacher_first, teachers.last_name as teacher_last, sections.expression,
+      SELECT u.studentsdcid, attendance_code.att_code, attendance_code.description as att_description, u.message, s.lastfirst, s.student_number,  students.id as studentid, s.first_name, s.last_name, teachers.first_name AS teacher_first, teachers.last_name as teacher_last, sections.expression,
        schools.name as school_name,
          courses.course_number, courses.course_name, terms.abbreviation,
          TO_CHAR(
