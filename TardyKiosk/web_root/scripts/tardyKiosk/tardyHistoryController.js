@@ -34,7 +34,7 @@
       function printHistory(item) {
         getSettings()
         .then(function(settings) {
-          window.open('/admin/tardy_kiosk/tardy_slip.html?student_number='+item.student_number+'&name='+item.first_name+' '+item.last_name+'&teacher='+item.teacher_first+' '+item.teacher_last+'&class='+item.course_name+' '+item.expression+'&class_tardy_count='+item.class_tardy_count+'&total_tardy_count='+item.total_tardy_count+'&comment='+((item.comment) ? item.comment : '')+'&footer='+((settings.footer != null) ? settings.footer : '')+'&header='+((settings.header != null) ? settings.header : '')+'&code='+item.att_code+' - '+item.att_description+'&date='+item.dateentered, "tardySlipFrame", "width=350,height=300");
+          window.open('/admin/tardy_kiosk/tardy_slip.html?student_number='+item.student_number+'&sid='+item.studentid+'&name='+item.first_name+' '+item.last_name+'&teacher='+item.teacher_first+' '+item.teacher_last+'&class='+item.course_name+' '+item.expression+'&class_tardy_count='+item.class_tardy_count+'&total_tardy_count='+item.total_tardy_count+'&comment='+((item.comment) ? item.comment : '')+'&footer='+((settings.footer != null) ? settings.footer : '')+'&header='+((settings.header != null) ? settings.header : '')+'&code='+item.att_code+' - '+item.att_description+'&date='+item.dateentered, "tardySlipFrame", "width=350,height=300");
         })
       }
 
