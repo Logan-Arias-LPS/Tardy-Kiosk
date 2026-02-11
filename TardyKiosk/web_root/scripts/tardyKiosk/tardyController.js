@@ -1,5 +1,5 @@
 /**
- * TardyKiosk 1.1.16
+ * TardyKiosk 1.1.20
  *
  * TardyKiosk Plugin for PowerSchool
  *
@@ -39,7 +39,7 @@
       }
       vm.tardy = tardy;
       vm.comment = '';
-      vm.existingAttendance = {dcid: '', att_code: '' };
+      vm.existingAttendance = {dcid: '', att_code: '', att_comment: '' };
 
       $j('#kiosk_main').click(function() {
          angular.element('#student_lookup').trigger('focus');
@@ -227,7 +227,7 @@
                 return( $q.reject( new Error( "" ) ) );
               }
             } else {
-              vm.existingAttendance = {dcid: '', att_code: '' };
+              vm.existingAttendance = {dcid: '', att_code: '', att_comment: '' };
             }
           });
       }
@@ -241,7 +241,7 @@
       }
 
       function submitTardy() {
-        var comment = (vm.comment.length > 0) ? vm.comment : vm.settings.default_comment;
+        var comment = (vm.comment && vm.comment.length > 0) ? vm.comment : vm.settings.default_comment;
         myDate = new Date();
         slip_dates = {date: (myDate.getMonth()+1) + "/" + myDate.getDate() + "/" + myDate.getFullYear(), time: myDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })};
         return tardyService.submitTardy(vm.existingAttendance, vm.section.minutes_late, (vm.override_section) ? vm.override_section: vm.section, vm.dates, vm.settings, comment, slip_dates)

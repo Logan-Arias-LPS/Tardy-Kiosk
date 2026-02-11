@@ -19,7 +19,7 @@
   <!-- start of content area -->
 
   <div id="tardyModule" class="tabs">
-    <ul>
+    <ul class="shown_tabs">
       <li><a id="kiosk_main" href="#tardyMain">Tardy Entry</a></li>
       <li><a id="kiosk_history_tab" href="#tardyHistory">Kiosk History</a></li>
       <li><a href="#tardySettings">Setup</a></li>
@@ -305,6 +305,9 @@
   <!-- end of content area -->
   ~[wc:admin_footer_css]
   <script>
+    require.config({
+      urlArgs: 'v=1.1.20'
+    });
     require([
     'angular',
     'tardyKiosk/tardyModule',
