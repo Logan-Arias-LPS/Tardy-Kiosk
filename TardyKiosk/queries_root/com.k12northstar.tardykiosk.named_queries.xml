@@ -164,12 +164,14 @@
     <columns>
       <column column="attendance.dcid">dcid</column>
       <column column="attendance_code.att_code">att_code</column>
+      <column column="attendance.att_comment">att_comment</column>
     </columns>
     <sql>
       <![CDATA[
       SELECT
           attendance.dcid,
-          ac.att_code
+          ac.att_code,
+          attendance.att_comment
       FROM
           attendance
           JOIN attendance_code ac ON (attendance.attendance_codeid=ac.id)

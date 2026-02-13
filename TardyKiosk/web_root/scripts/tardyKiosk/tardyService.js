@@ -114,6 +114,7 @@
 
         var attend = '';
         var comment = '';
+        var full_comment = ''
         var tardy_code_def = (settings.user.tardy_code_def) ? settings.user.tardy_code_def : settings.tardy_code_def;
         var late_tardy_code_def = (settings.user.late_tardy_code_def) ? settings.user.late_tardy_code_def : settings.late_tardy_code_def;
         var tardy_minutes = (settings.user.tardy_minutes) ? settings.user.tardy_minutes : settings.tardy_minutes;
@@ -134,6 +135,12 @@
           comment_value = comment_value.replace('{checkintime}', slip_dates.time);
           comment_value = comment_value.replace('{checkindatetime}', slip_dates.date+' '+slip_dates.time);
         }
+        if (existingAttendance.att_comment && existingAttendance.att_comment.length > 0) {
+          full_comment = existingAttendance.att_comment;
+          if (comment_value) { full_comment = full_comment + "\n-----------------------\n" + comment_value; }
+        } else {
+          full_comment = comment_value;
+        }
         var tardy_code = (parseInt(minutes_late) >= late_tardy_minutes && late_tardy_code_def) ? late_tardy_code_def: tardy_code_def;
         var url = "/admin/attendance/record/week/meeting.html?frn=001"+section.studentsdcid+"&ATT_RecordMode=ATT_ModeMeeting";
         var payload = {
@@ -141,7 +148,7 @@
           studentId: section.studentid,
           ac: 'att_recordforweek',
           [attend]: tardy_code.code,
-          [comment]: comment_value,
+          [comment]: full_comment,
           startDate: dates.viewDate,
           endDate: dates.viewDate,
           savecomments: '1',
