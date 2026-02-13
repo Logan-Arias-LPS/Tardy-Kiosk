@@ -251,6 +251,7 @@
             <button ng-click="vm.testPrint()">Test Print</button>
             <button ng-click="vm.save()">Save Settings</button>
           </div>
+<div hidden>
           <table>
           <tr>
             <th colspan="4">Temp User Override Settings for ~[tlist_sql;SELECT lastfirst FROM USERS WHERE dcid=~[x:users_dcid]]~(name)[/tlist_sql]</th>
@@ -295,9 +296,12 @@
             </td>
           </tr>
         </table>
+</div>
+<div hidden>
         <div class="button-row">
           <button ng-click="vm.clearTempSettings()">Clear Temp User Settings</button>
         </div>
+</div>
       </div>
     </div>
   </div>
