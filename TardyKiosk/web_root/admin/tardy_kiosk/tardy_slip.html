@@ -16,13 +16,17 @@
     div {
       padding-bottom: 2px;
     }
+    div#centerholder {
+      display: flex;
+      justify-content: center;
+    }
   </style>
 ~[wc:commonscripts]
 </head>
 <body>
   <div id="header"style="text-align: center">~(gpv.header)</div>
   <br />
-  <div id="photoholder"><label>Photo:</label></div>
+  <div id="centerholder"><div id="photoholder"></div></div>
   <div><label>Student #:</label> ~(gpv.student_number)</div>
   <div><label>Name:</label> ~(gpv.name)</div>
   <div><label>Date:</label> ~(gpv.date)</div>
@@ -44,6 +48,8 @@
   $j(document).ready(function () {
   if ($j("div#studenttitlephoto2 > #student_details_avatar > a > img:first").length > 0) {
     $j("#photoholder").append($j("div#studenttitlephoto2 > #student_details_avatar > a > img:first"));
+    $j("#photoholder > img").attr("height", (parseInt(Number($j("#photoholder > img").attr("height")) * 1.25)));
+    $j("#photoholder > img").attr("width", (parseInt(Number($j("#photoholder > img").attr("width")) * 1.25)));
   } else {
     $j("#photoholder").append('<div id="student_details_avatar" class="initial_details_avatar"><span class="initial_avatar" style="font-size: 20px;">No Photo</span></div>');
   }
